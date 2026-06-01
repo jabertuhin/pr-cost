@@ -6,10 +6,7 @@
   "plugins": [
     {
       "name": "pr-cost",
-      "source": {
-        "source": "github",
-        "repo": "jabertuhin/pr-cost"
-      },
+      "source": "./plugins/pr-cost",
       "description": "Embed per-branch Claude Code token spend into PR descriptions",
       "version": "0.1.0"
     }
