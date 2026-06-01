@@ -6,7 +6,5 @@
   "author": {
     "name": "Mir Jaber"
   },
-  "keywords": ["claude-code", "cost", "tokens", "pr", "github"],
-  "commands": ["./commands/pr-cost.md"],
-  "hooks": "./hooks/hooks.json"
+  "keywords": ["claude-code", "cost", "tokens", "pr", "github"]
 }
