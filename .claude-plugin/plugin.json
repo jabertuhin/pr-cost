@@ -1,0 +1,12 @@
+{
+  "name": "pr-cost",
+  "displayName": "pr-cost",
+  "version": "0.1.0",
+  "description": "Embed per-branch Claude Code token spend into PR descriptions",
+  "author": {
+    "name": "Mir Jaber"
+  },
+  "keywords": ["claude-code", "cost", "tokens", "pr", "github"],
+  "commands": ["./commands/pr-cost.md"],
+  "hooks": "./hooks/hooks.json"
+}
