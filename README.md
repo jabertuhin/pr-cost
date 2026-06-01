@@ -18,6 +18,35 @@ _branch `feature/x` · 27 turns across 3 sessions · pr-cost v0.1.0_
 When only one model contributed, the Total row is omitted (it would
 duplicate the single data row).
 
+## Why this exists
+
+AI coding spend is invisible at the level engineers actually work — the
+feature branch and the PR. Your monthly dashboard might tell you the team
+burned 80M tokens, but not whether the PR you just merged cost $0.50 or $50,
+or which kinds of work (debugging, scaffolding, refactors) are expensive vs.
+cheap for you specifically. This plugin makes per-feature cost a number that
+lives where reviewers already look — right in the PR description, durable in
+git history.
+
+**Who this helps:**
+
+- **Individual developers** — see which kinds of work burn the most tokens
+  for you, and notice when a "quick fix" actually cost as much as a feature
+  rebuild.
+- **Reviewers** — high cost on a small diff is a useful signal (over-iteration,
+  wrong approach, scope creep). Low cost on a large diff is the opposite
+  signal. Both are worth a glance before approving.
+- **Teams budgeting AI spend** — per-PR figures aggregate naturally into
+  per-sprint, per-team, or per-quarter reports without bespoke instrumentation;
+  the data lives in PR descriptions and `~/.claude/pr-cost/usage/` JSONL.
+- **Anyone curious about their own AI costs** — the per-branch JSONL is a
+  raw stream you can query, plot, or pipe into whatever you want.
+
+**Honest scope.** This tracks Claude Code spend only — not Codex, Cursor,
+the raw Anthropic API, or the Console. Attribution is single-machine: if a
+teammate works the same branch from a different laptop, their slice lives
+on their machine, not yours.
+
 ## How it works
 
 1. A `Stop` hook fires at the end of every Claude Code turn and rolls up that
