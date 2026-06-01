@@ -38,6 +38,18 @@ Pricing comes from
 the same source [ccusage](https://github.com/ryoppippi/ccusage) uses. Cached
 on disk for 24h with a bundled fallback snapshot for offline first runs.
 
+## Requirements
+
+- **Python 3.9 or later** — invoked as `python3`. Stdlib only; no `pip install`
+  step. Ships with macOS 12+ and modern Linux distros; on older systems install
+  via `brew install python` / your package manager.
+- **`gh` CLI** — used to read and update PR bodies (`gh pr view`, `gh pr edit`).
+  Authenticate once with `gh auth login`.
+- **`git`** — used to detect the current branch and the `origin` remote URL.
+- **Claude Code** with plugins enabled.
+
+Tested on macOS and Linux. Windows is untested.
+
 ## Install
 
 From the public marketplace:
@@ -57,9 +69,6 @@ For local development install (point at a checkout instead of the public repo):
 claude plugin marketplace add /path/to/pr-cost
 claude plugin install pr-cost@pr-cost
 ```
-
-Requires `python3` (stdlib only — no `pip install`) and `gh` for PR injection.
-Tested on macOS and Linux; Windows is untested.
 
 ## Verify, update, uninstall
 
