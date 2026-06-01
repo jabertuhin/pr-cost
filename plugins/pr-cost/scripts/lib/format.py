@@ -44,20 +44,31 @@ def render(
     if show_dollars:
         cols.append("Cost")
     header = "| " + " | ".join(cols) + " |"
-    sep = "|" + "|".join(["---"] * len(cols)) + "|"
+    # First column (Model) is text → left-align; numeric columns → right-align.
+    sep = "|---|" + "|".join(["---:"] * (len(cols) - 1)) + "|"
 
     if not show_dollars:
         rows = [_drop_last_col(r) for r in rows]
-        total_row = (
-            f"| **Total** | **{_fmt(grand_in)}** | **{_fmt(grand_out)}** | "
-            f"**{_fmt(grand_cw)} / {_fmt(grand_cr)}** |"
-        )
-    else:
-        total_cost_cell = f"**${grand_cost:.2f}**" if not any_unpriced else f"**~${grand_cost:.2f}**"
-        total_row = (
-            f"| **Total** | **{_fmt(grand_in)}** | **{_fmt(grand_out)}** | "
-            f"**{_fmt(grand_cw)} / {_fmt(grand_cr)}** | {total_cost_cell} |"
-        )
+
+    # Suppress the Total row when there is only one model — it would duplicate
+    # the data row exactly. Keep it for two or more models.
+    show_total = len(totals.by_model) > 1
+    table_rows = list(rows)
+    if show_total:
+        if not show_dollars:
+            total_row = (
+                f"| **Total** | **{_fmt(grand_in)}** | **{_fmt(grand_out)}** | "
+                f"**{_fmt(grand_cw)} / {_fmt(grand_cr)}** |"
+            )
+        else:
+            total_cost_cell = (
+                f"**${grand_cost:.2f}**" if not any_unpriced else f"**~${grand_cost:.2f}**"
+            )
+            total_row = (
+                f"| **Total** | **{_fmt(grand_in)}** | **{_fmt(grand_out)}** | "
+                f"**{_fmt(grand_cw)} / {_fmt(grand_cr)}** | {total_cost_cell} |"
+            )
+        table_rows.append(total_row)
 
     sessions = len(totals.sessions)
     footer = (
@@ -66,7 +77,7 @@ def render(
         f"· pr-cost v{PLUGIN_VERSION}_"
     )
 
-    body = "\n".join([BLOCK_MARKER, "", header, sep, *rows, total_row, "", footer, ""])
+    body = "\n".join([BLOCK_MARKER, "", header, sep, *table_rows, "", footer, ""])
     return body
 
 

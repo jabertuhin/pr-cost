@@ -7,13 +7,16 @@ it as a cost block in your PR descriptions.
 ## 🤖 Claude Code Spend
 
 | Model | Input | Output | Cache W / R | Cost |
-|---|---|---|---|---|
+|---|---:|---:|---:|---:|
 | opus-4-7 | 12.4K | 48.2K | 1.2M / 320K | $4.21 |
 | sonnet-4-6 | 3.1K | 8.0K | 220K / 0 | $0.18 |
-| **Total** | | | | **$4.39** |
+| **Total** | **15.5K** | **56.2K** | **1.4M / 320K** | **$4.39** |
 
 _branch `feature/x` · 27 turns across 3 sessions · pr-cost v0.1.0_
 ```
+
+When only one model contributed, the Total row is omitted (it would
+duplicate the single data row).
 
 ## How it works
 
@@ -24,7 +27,11 @@ _branch `feature/x` · 27 turns across 3 sessions · pr-cost v0.1.0_
 2. `/pr-cost` renders the cost block from the aggregate (no transcript re-walk)
    and prompts you to inject it into the open PR for the current branch.
 3. Optional: a `PostToolUse` hook auto-injects the block whenever Claude Code
-   runs `gh pr create`. Toggle off via `auto_inject_on_gh_pr_create: false`.
+   itself runs `gh pr create`. The hook only fires for `gh pr create` invoked
+   by Claude Code — if you run `gh pr create` in a separate terminal, use
+   `/pr-cost` to inject after the PR is open. Toggle the auto-inject off via
+   `auto_inject_on_gh_pr_create: false`. The `Stop` capture hook keeps running
+   regardless; the config only gates injection.
 
 Pricing comes from
 [LiteLLM's `model_prices_and_context_window.json`](https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json),
@@ -33,17 +40,34 @@ on disk for 24h with a bundled fallback snapshot for offline first runs.
 
 ## Install
 
+From the public marketplace:
 ```
 /plugin marketplace add jabertuhin/pr-cost
-/plugin install pr-cost
+/plugin install pr-cost@pr-cost
 ```
 
-For local development install:
+Or via the CLI (equivalent, scriptable):
 ```
-/plugin install pr-cost --source /path/to/pr-cost
+claude plugin marketplace add jabertuhin/pr-cost
+claude plugin install pr-cost@pr-cost
+```
+
+For local development install (point at a checkout instead of the public repo):
+```
+claude plugin marketplace add /path/to/pr-cost
+claude plugin install pr-cost@pr-cost
 ```
 
 Requires `python3` (stdlib only — no `pip install`) and `gh` for PR injection.
+Tested on macOS and Linux; Windows is untested.
+
+## Verify, update, uninstall
+
+```
+claude plugin list                                              # confirm enabled
+claude plugin marketplace update pr-cost && claude plugin update pr-cost@pr-cost
+claude plugin uninstall pr-cost@pr-cost
+```
 
 ## Configuration
 
@@ -61,16 +85,16 @@ Requires `python3` (stdlib only — no `pip install`) and `gh` for PR injection.
 }
 ```
 
-- `auto_inject_on_gh_pr_create` — false to disable the PostToolUse hook; the
-  `/pr-cost` slash command still works.
-- `show_dollars` — false to show tokens only (no $ column or row).
+- `auto_inject_on_gh_pr_create` — `false` to disable the PostToolUse hook;
+  the `/pr-cost` slash command still works and capture continues.
+- `show_dollars` — `false` to show tokens only (no `$` column or row).
 
 ## Usage
 
-- `/pr-cost` — print the cost block for the current branch in chat, then prompt
-  to inject into the open PR.
-- The PostToolUse hook will auto-inject whenever Claude Code runs
-  `gh pr create` (if enabled).
+- `/pr-cost` — print the cost block for the current branch in chat, then
+  prompt to inject into the open PR.
+- The PostToolUse hook auto-injects whenever Claude Code itself runs
+  `gh pr create` (when enabled).
 
 ## Data on disk
 
@@ -82,8 +106,10 @@ Requires `python3` (stdlib only — no `pip install`) and `gh` for PR injection.
   usage/<repo-slug>/<branch>.jsonl
 ```
 
-Repo slug is derived from `git remote get-url origin` (e.g.
-`github.com-mirjaber-data-platform`) to avoid collisions between clones.
+Repo slug is derived from the `origin` remote URL (e.g. for
+`git@github.com:acme/widgets.git` the slug is `github.com-acme-widgets`),
+not from your GitHub username — that's what avoids collisions between
+clones of differently-owned forks.
 
 ## Limitations
 
