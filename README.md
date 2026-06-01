@@ -53,12 +53,14 @@ on their machine, not yours.
    turn's token usage into `~/.claude/pr-cost/usage/<repo-slug>/<branch>.jsonl`.
    Branch is read from the `gitBranch` field already present on every transcript
    line, so mid-session branch switches are handled correctly.
-2. `/pr-cost` renders the cost block from the aggregate (no transcript re-walk)
-   and prompts you to inject it into the open PR for the current branch.
+2. `/pr-cost:report` renders the cost block from the aggregate (no transcript
+   re-walk) and prompts you to inject it into the open PR for the current
+   branch.
 3. Optional: a `PostToolUse` hook auto-injects the block whenever Claude Code
    itself runs `gh pr create`. The hook only fires for `gh pr create` invoked
    by Claude Code — if you run `gh pr create` in a separate terminal, use
-   `/pr-cost` to inject after the PR is open. Toggle the auto-inject off via
+   `/pr-cost:report` to inject after the PR is open. Toggle the auto-inject
+   off via
    `auto_inject_on_gh_pr_create: false`. The `Stop` capture hook keeps running
    regardless; the config only gates injection.
 
@@ -124,13 +126,13 @@ claude plugin uninstall pr-cost@pr-cost
 ```
 
 - `auto_inject_on_gh_pr_create` — `false` to disable the PostToolUse hook;
-  the `/pr-cost` slash command still works and capture continues.
+  the `/pr-cost:report` slash command still works and capture continues.
 - `show_dollars` — `false` to show tokens only (no `$` column or row).
 
 ## Usage
 
-- `/pr-cost` — print the cost block for the current branch in chat, then
-  prompt to inject into the open PR.
+- `/pr-cost:report` — print the cost block for the current branch in chat,
+  then prompt to inject into the open PR.
 - The PostToolUse hook auto-injects whenever Claude Code itself runs
   `gh pr create` (when enabled).
 
